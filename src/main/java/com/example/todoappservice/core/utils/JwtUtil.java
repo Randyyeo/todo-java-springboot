@@ -20,22 +20,27 @@ public class JwtUtil {
   private static final String secret = "asdfSFS34wfsdfsdfSDSD32dfsddDDerQSNCK34SOWEK5354fdgdf4";
 
   public static String jwtBuilder(Long id, String email, String name){
+    try {
+      Key key = new SecretKeySpec(Base64.getDecoder().decode(secret),
+              SignatureAlgorithm.HS256.getJcaName());
 
-    Key key = new SecretKeySpec(Base64.getDecoder().decode(secret),
-            SignatureAlgorithm.HS256.getJcaName());
+      Instant now = Instant.now();
+      String jwtToken = Jwts.builder()
+              .claim("id", id)
+              .claim("email", email)
+              .setSubject(name)
+              .setId(UUID.randomUUID().toString())
+              .setIssuedAt(Date.from(now))
+              .setExpiration(Date.from(now.plus(60l, ChronoUnit.MINUTES)))
+              .signWith(SignatureAlgorithm.HS256, key)
+              .compact();
+      System.out.println(jwtToken);
+      return jwtToken;
+    } catch (Exception e){
+      System.out.println(e);
+      return "";
+    }
 
-    Instant now = Instant.now();
-    String jwtToken = Jwts.builder()
-            .claim("id", id)
-            .claim("email", email)
-            .setSubject(name)
-            .setId(UUID.randomUUID().toString())
-            .setIssuedAt(Date.from(now))
-            .setExpiration(Date.from(now.plus(60l, ChronoUnit.MINUTES)))
-            .signWith(SignatureAlgorithm.HS256, key)
-            .compact();
-
-    return jwtToken;
   }
 
   public static Claims verifyToken(String token){

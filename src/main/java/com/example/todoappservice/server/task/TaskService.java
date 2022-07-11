@@ -2,7 +2,9 @@ package com.example.todoappservice.server.task;
 
 import com.example.todoappservice.core.exception.InternalServerException;
 import com.example.todoappservice.core.task.TaskDaoUtils;
+import com.example.todoappservice.core.utils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -27,24 +29,26 @@ public class TaskService {
     }
   }
 
-  public void createTask(Task task) {
+  public ResponseEntity createTask(Task task) {
     try {
       taskDaoUtils.createTask(task);
+      return ResponseUtil.responseTaskCreated(task.getId());
     } catch (Exception e){
       throw new InternalServerException(e.getMessage());
     }
   }
 
-  public void deleteTask(Long taskId) {
+  public ResponseEntity deleteTask(Long taskId) {
     try {
       taskDaoUtils.deleteTaskById(taskId);
+      return ResponseUtil.responseTaskDeleted(taskId);
     } catch (Exception e){
       throw new InternalServerException(e.getMessage());
     }
   }
 
   @Transactional
-  public void updateTask(Long taskId, String taskMessage, boolean needReminder) {
+  public ResponseEntity updateTask(Long taskId, String taskMessage, boolean needReminder) {
     try {
       Task task = taskDaoUtils.getTaskById(taskId);
 
@@ -59,14 +63,21 @@ public class TaskService {
       ) {
         task.setReminder(needReminder);
       }
+
+      return ResponseUtil.responseTaskUpdated(taskId);
     } catch (Exception e){
       throw new InternalServerException(e.getMessage());
     }
   }
 
-  public Task getTaskById(Long taskId) {
+  public ResponseEntity getTaskById(Long taskId) {
     try {
-      return taskDaoUtils.getTaskById(taskId);
+      Task task = taskDaoUtils.getTaskById(taskId);
+      if (task != null){
+        return ResponseUtil.responseOk(task);
+      } else {
+        return ResponseUtil.responseTaskNotFound(taskId);
+      }
     } catch (Exception e){
       throw new InternalServerException(e.getMessage());
     }

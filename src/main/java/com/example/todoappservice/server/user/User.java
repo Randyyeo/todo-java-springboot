@@ -1,10 +1,9 @@
 package com.example.todoappservice.server.user;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
+import javax.persistence.*;
 
+@Entity
+@Table
 public class User {
 
   @javax.persistence.Id
@@ -22,15 +21,13 @@ public class User {
   private String email;
   private String password;
 
+  public User(){
+  }
   public User(Long id, String name, String email, String password) {
     this.Id = id;
     this.name = name;
     this.email = email;
     this.password = password;
-  }
-
-  public User(){
-
   }
 
   public Long getId() {

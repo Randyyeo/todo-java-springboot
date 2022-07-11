@@ -12,48 +12,41 @@ import java.util.List;
 @RequestMapping(path = "api/v1/task")
 public class TaskController {
 
-    private final TaskService taskService;
+  private final TaskService taskService;
 
-    @Autowired
-    public TaskController(TaskService taskService) {
-        this.taskService = taskService;
-    }
+  @Autowired
+  public TaskController(TaskService taskService) {
+    this.taskService = taskService;
+  }
 
-    @GetMapping
-    public List<Task> getAllTasks(){
-        try {
-            return taskService.getAllTasks();
-        } catch (Exception e){
-            throw new InternalServerException(e.getMessage());
-        }
-    }
+  @GetMapping
+  public List<Task> getAllTasks() {
 
-    @GetMapping(path = "{taskId}")
-    public ResponseEntity getTaskById(@PathVariable("taskId") Long taskId){
-        try {
-            Task task = taskService.getTaskById(taskId);
-            return ResponseUtil.responseOk(task);
-        } catch (Exception e) {
-            return ResponseUtil.responseNotFound(e);
-        }
-    }
+    return taskService.getAllTasks();
 
-    @PostMapping
-    public void createTask(@RequestBody Task task){
-        taskService.createTask(task);
-    }
+  }
 
-    @DeleteMapping(path = "{taskId}")
-    public void deleteTask(@PathVariable("taskId") Long taskId){
-        taskService.deleteTask(taskId);
-    }
+  @GetMapping(path = "{taskId}")
+  public ResponseEntity getTaskById(@PathVariable("taskId") Long taskId) {
+    return taskService.getTaskById(taskId);
+  }
 
-    @PutMapping(path = "{taskId}")
-    public void updateTask(
-            @PathVariable("studentId") Long taskId,
-            @RequestParam(required = false) String task,
-            @RequestParam(required = false) boolean needReminder
-    ){
-        taskService.updateTask(taskId, task, needReminder);
-    }
+  @PostMapping
+  public ResponseEntity createTask(@RequestBody Task task) {
+    return taskService.createTask(task);
+  }
+
+  @DeleteMapping(path = "{taskId}")
+  public ResponseEntity deleteTask(@PathVariable("taskId") Long taskId) {
+    return taskService.deleteTask(taskId);
+  }
+
+  @PutMapping(path = "{taskId}")
+  public ResponseEntity updateTask(
+          @PathVariable("studentId") Long taskId,
+          @RequestParam(required = false) String task,
+          @RequestParam(required = false) boolean needReminder
+  ) {
+    return taskService.updateTask(taskId, task, needReminder);
+  }
 }

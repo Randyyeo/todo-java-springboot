@@ -3,9 +3,9 @@ package com.example.todoappservice.core.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-public class InternalServerException extends RuntimeException {
-  public InternalServerException(String message) {
+@ResponseStatus(HttpStatus.UNAUTHORIZED)
+public class UserUnauthorizedException extends RuntimeException {
+  public UserUnauthorizedException(String message){
     super(message);
   }
 }

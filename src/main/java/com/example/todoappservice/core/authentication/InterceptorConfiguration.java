@@ -8,6 +8,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class InterceptorConfiguration implements WebMvcConfigurer {
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
-    registry.addInterceptor(new BasicAuthInterceptor()).excludePathPatterns("**/user/**");
+    registry.addInterceptor(new BasicAuthInterceptor()).excludePathPatterns("/**/user/**");
   }
 }
