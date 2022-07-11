@@ -1,6 +1,7 @@
 package com.example.todoappservice.server.user.login;
 
 import com.example.todoappservice.core.exception.InternalServerException;
+import com.example.todoappservice.core.exception.TaskNotFoundException;
 import com.example.todoappservice.core.user.UserDaoUtils;
 import com.example.todoappservice.core.utils.JwtUtil;
 import com.example.todoappservice.core.utils.ResponseUtil;
@@ -17,21 +18,26 @@ public class LoginService {
   }
 
   public ResponseEntity loginUser(User user){
-    User userFromDatabase = userDaoUtils.findUser(user.getEmail());
-    if (userFromDatabase != null){
-      if (userDaoUtils.verifyPassword(userFromDatabase.getPassword(), user.getPassword())){
-        try {
+    try {
+      User userFromDatabase = userDaoUtils.findUser(user.getEmail());
+      if (userFromDatabase != null){
+        if (userDaoUtils.verifyPassword(userFromDatabase.getPassword(), user.getPassword())){
           String token = JwtUtil.jwtBuilder(userFromDatabase.getId(), user.getEmail(), user.getName());
           return ResponseUtil.responseLoginSuccess(userFromDatabase.getId(), token);
-        } catch (Exception e){
-          throw new InternalServerException(e.getMessage());
+        } else {
+          return ResponseUtil.responseNotAuthorized();
         }
-      } else {
-        return ResponseUtil.responseNotAuthorized();
-      }
 
-    } else {
-      return ResponseUtil.responseUserNotFound(user.getEmail());
+      } else {
+        return ResponseUtil.responseUserNotFound(user.getEmail());
+      }
+    } catch (Exception e){
+      if (e instanceof TaskNotFoundException){
+        throw new TaskNotFoundException(e.getMessage());
+      } else {
+        throw new InternalServerException(e.getMessage());
+      }
     }
+
   }
 }

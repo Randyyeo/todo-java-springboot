@@ -1,8 +1,11 @@
 package com.example.todoappservice.core.authentication;
 
+import com.example.todoappservice.core.exception.UserForbiddenException;
+import com.example.todoappservice.core.exception.UserUnauthorizedException;
 import com.example.todoappservice.core.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
+import org.apache.catalina.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
@@ -15,18 +18,31 @@ public class BasicAuthInterceptor extends HandlerInterceptorAdapter {
 
     try {
       String token = request.getHeader("Authorization").split(" ")[1];
-      Claims jwtValues = JwtUtil.verifyToken(token);
-      if (JwtUtil.verifyToken(token) != null){
+      try {
+        Claims jwtValues = JwtUtil.verifyToken(token);
         request.setAttribute("userId", jwtValues.get("id"));
         return true;
-      } else {
-        response.sendError(Integer.parseInt(HttpStatus.UNAUTHORIZED.toString()), "Unauthorized User");
-        return false;
+
+      } catch (Exception e){
+        throw new UserForbiddenException("User is forbidden to access");
       }
 
     } catch(Exception e){
-      response.sendError(Integer.parseInt(HttpStatus.FORBIDDEN.toString()), "JWT token expired");
-      return false;
+      System.out.println("ERROR");
+      if (e instanceof UserForbiddenException){
+        throw new UserForbiddenException(e.getMessage());
+      } else {
+        throw new UserUnauthorizedException("User is unauthorized");
+      }
+    }
+  }
+
+  public boolean postHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+
+    try {
+      return true;
+    } catch(Exception e){
+      throw new UserUnauthorizedException("User is unauthorized");
     }
   }
 }

@@ -20,7 +20,6 @@ public class JwtUtil {
   private static final String secret = "asdfSFS34wfsdfsdfSDSD32dfsddDDerQSNCK34SOWEK5354fdgdf4";
 
   public static String jwtBuilder(Long id, String email, String name){
-    try {
       Key key = new SecretKeySpec(Base64.getDecoder().decode(secret),
               SignatureAlgorithm.HS256.getJcaName());
 
@@ -34,12 +33,7 @@ public class JwtUtil {
               .setExpiration(Date.from(now.plus(60l, ChronoUnit.MINUTES)))
               .signWith(SignatureAlgorithm.HS256, key)
               .compact();
-      System.out.println(jwtToken);
       return jwtToken;
-    } catch (Exception e){
-      System.out.println(e);
-      return "";
-    }
 
   }
 

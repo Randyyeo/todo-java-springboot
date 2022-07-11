@@ -1,12 +1,12 @@
 package com.example.todoappservice.core.task;
 
+import com.example.todoappservice.core.exception.TaskNotFoundException;
 import com.example.todoappservice.server.task.Task;
+import org.hibernate.exception.JDBCConnectionException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.CannotCreateTransactionException;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 @Component
@@ -31,11 +31,27 @@ public class TaskDaoUtils {
   }
 
   public Task getTaskById(Long Id){
-    return taskDao.findById(Id).get();
+    try {
+      return taskDao.findById(Id).get();
+    } catch (Exception e){
+      if (e instanceof CannotCreateTransactionException){
+        System.out.println(e);
+        throw e;
+      } else {
+        throw new TaskNotFoundException("Task cannot be found for Id: " + Id);
+      }
+    }
   }
 
   public void deleteTaskById(Long Id) {
-    taskDao.deleteById(Id);
+    try {
+      taskDao.deleteById(Id);
+    } catch (Exception e){
+      if (e instanceof JDBCConnectionException){
+        throw e;
+      }
+      throw new TaskNotFoundException("Task cannot be found for Id: " + Id);
+    }
   }
 
   public void createTask(Task task) {

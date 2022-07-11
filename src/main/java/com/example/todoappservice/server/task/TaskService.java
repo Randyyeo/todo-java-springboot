@@ -1,6 +1,7 @@
 package com.example.todoappservice.server.task;
 
 import com.example.todoappservice.core.exception.InternalServerException;
+import com.example.todoappservice.core.exception.TaskNotFoundException;
 import com.example.todoappservice.core.task.TaskDaoUtils;
 import com.example.todoappservice.core.utils.ResponseUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,20 +67,24 @@ public class TaskService {
 
       return ResponseUtil.responseTaskUpdated(taskId);
     } catch (Exception e){
-      throw new InternalServerException(e.getMessage());
+      if (e instanceof TaskNotFoundException){
+        throw new TaskNotFoundException(e.getMessage());
+      } else {
+        throw new InternalServerException(e.getMessage());
+      }
     }
   }
 
   public ResponseEntity getTaskById(Long taskId) {
     try {
       Task task = taskDaoUtils.getTaskById(taskId);
-      if (task != null){
-        return ResponseUtil.responseOk(task);
-      } else {
-        return ResponseUtil.responseTaskNotFound(taskId);
-      }
+      return ResponseUtil.responseOk(task);
     } catch (Exception e){
-      throw new InternalServerException(e.getMessage());
+      if (e instanceof TaskNotFoundException){
+        throw new TaskNotFoundException(e.getMessage());
+      } else {
+        throw new InternalServerException(e.getMessage());
+      }
     }
   }
 }
